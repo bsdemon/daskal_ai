@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: daskal-ai-deployment
+  namespace: argocd
+spec:
+  selector:
+    matchLabels:
+      app: daskal-ai-pod
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: daskal-ai-pod
+    spec:
+      containers:
+        - name: daskal-ai
+          image: ghcr.io/open-webui/open-webui:main
+          ports:
+            - containerPort: 3000
