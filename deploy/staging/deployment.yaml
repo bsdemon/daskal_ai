@@ -17,4 +17,4 @@ spec:
         - name: daskal-ai
           image: ghcr.io/open-webui/open-webui:main
           ports:
-            - containerPort: 8000
+            - containerPort: 8080
