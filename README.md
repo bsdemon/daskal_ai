@@ -2,7 +2,7 @@
 Daskal AI
 
 ## Update backend
-Since there is only ":latest" tag available in docker hub, to trigger pod image update, change v1 to v2:
+Since there is only ":latest" tag available in docker hub, to trigger pod image update, change v1 to v2 in deployment.yaml:
 ``` xml
 template:
   metadata:
