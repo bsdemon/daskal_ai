@@ -1,17 +1,17 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: daskal-ai-deployment
+  name: prod-daskal-ai-deployment
   namespace: argocd
 spec:
   selector:
     matchLabels:
-      app: daskal-ai-pod
+      app: prod-daskal-ai-pod
   replicas: 1
   template:
     metadata:
       labels:
-        app: daskal-ai-pod
+        app: prod-daskal-ai-pod
     spec:
       containers:
         - name: daskal-ai
