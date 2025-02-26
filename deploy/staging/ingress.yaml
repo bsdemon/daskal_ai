@@ -2,9 +2,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: staging-daskal-ai-ingress
-  annotations:
-    # You might need specific annotations depending on your ingress controller
-    kubernetes.io/ingress.class: "nginx"  # Or another ingress controller you're using
+  namespace: argocd
 spec:
   rules:
   - host: staging.daskal.ai
