@@ -12,9 +12,18 @@ spec:
     metadata:
       labels:
         app: prod-daskal-ai-pod
+      annotations:
+        rollme: "v1"  # Change this value (e.g., to "v2", "v3", etc.) whenever you need to force a rollout
     spec:
       containers:
         - name: daskal-ai
           image: ghcr.io/open-webui/open-webui:main
           ports:
             - containerPort: 8080
+          volumeMounts:
+            - name: prod-data-volume
+              mountPath: /app/backend/data
+      volumes:
+        - name: prod-data-volume
+          persistentVolumeClaim:
+            claimName: prod-daskal-ai-data-pvc
