@@ -13,11 +13,11 @@ spec:
       labels:
         app: daskal-ai-pod
       annotations:
-        rollme: "v2"  # Change this value (e.g., to "v2", "v3", etc.) whenever you need to force a rollout
+        rollme: "v3"  # Change this value (e.g., to "v2", "v3", etc.) whenever you need to force a rollout
     spec:
       containers:
         - name: daskal-ai
-          image: ghcr.io/open-webui/open-webui:main
+          image: ghcr.io/bsdemon/open-webui:main
           imagePullPolicy: Always  # Added to ensure it always pulls the latest version
           ports:
             - containerPort: 8080
