@@ -24,6 +24,13 @@ spec:
           volumeMounts:
             - name: data-volume
               mountPath: /app/backend/data
+          resources:
+            requests:
+              memory: "6Gi"
+              cpu: "1.5"
+            limits:
+              memory: "7Gi"
+              cpu: "1.9"
       volumes:
         - name: data-volume
           persistentVolumeClaim:
