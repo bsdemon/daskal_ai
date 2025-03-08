@@ -1,0 +1,75 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: daskal-ai-dev1
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: git@github.com:bsdemon/daskal_ai.git  # Replace with your actual Git repository URL
+    targetRevision: HEAD
+    path: daskal-ai/overlays/dev1
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: daskal-ai-dev2
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: git@github.com:bsdemon/daskal_ai.git  # Replace with your actual Git repository URL
+    targetRevision: HEAD
+    path: daskal-ai/overlays/dev2
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: daskal-ai-dev3
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: git@github.com:bsdemon/daskal_ai.git  # Replace with your actual Git repository URL
+    targetRevision: HEAD
+    path: daskal-ai/overlays/dev3
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: daskal-ai-dev4
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: git@github.com:bsdemon/daskal_ai.git  # Replace with your actual Git repository URL
+    targetRevision: HEAD
+    path: daskal-ai/overlays/dev4
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
