@@ -1,7 +1,7 @@
 namespace: dev1
 
 resources:
-  - ../../base
+  - ../base
 
 namePrefix: dev1-
 
