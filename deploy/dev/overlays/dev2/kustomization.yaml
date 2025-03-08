@@ -21,3 +21,13 @@ patchesJson6902:
     - op: replace
       path: /spec/template/spec/volumes/0/persistentVolumeClaim/claimName
       value: dev2-daskal-ai-data-pvc
+
+- target:
+    kind: Ingress
+    group: networking.k8s.io
+    version: v1
+    name: daskal-ai-ingress
+  patch: |-
+    - op: replace
+      path: /spec/rules/0/host
+      value: dev2.daskal.ai
