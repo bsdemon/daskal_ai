@@ -29,8 +29,8 @@ spec:
               memory: "1Gi"
               cpu: "0.4"
             limits:
-              memory: "4Gi"
-              cpu: "1"
+              memory: "6Gi"
+              cpu: "1.5"
       volumes:
         - name: data-volume
           persistentVolumeClaim:
