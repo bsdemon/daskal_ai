@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: daskal-ai-deployment
+  namespace: argocd
+spec:
+  selector:
+    matchLabels:
+      app: daskal-ai-pod
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: daskal-ai-pod
+      annotations:
+        rollme: "v4"  # Change this value (e.g., to "v2", "v3", etc.) whenever you need to force a rollout
+    spec:
+      containers:
+        - name: daskal-ai
+          image: ghcr.io/bsdemon/open-webui:main
+          imagePullPolicy: Always  # Added to ensure it always pulls the latest version
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - name: data-volume
+              mountPath: /app/backend/data
+          resources:
+            requests:
+              memory: "6Gi"
+              cpu: "1.5"
+            limits:
+              memory: "7Gi"
+              cpu: "1.9"
+      volumes:
+        - name: data-volume
+          persistentVolumeClaim:
+            claimName: daskal-ai-data-pvc

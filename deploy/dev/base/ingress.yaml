@@ -1,0 +1,17 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: daskal-ai-ingress
+  namespace: argocd
+spec:
+  rules:
+  - host: daskal.ai
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: daskal-ai-service
+            port:
+              number: 8080
