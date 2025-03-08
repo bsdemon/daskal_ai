@@ -7,8 +7,8 @@ spec:
   project: default
   source:
     repoURL: git@github.com:bsdemon/daskal_ai.git  # Replace with your actual Git repository URL
-    targetRevision: HEAD
-    path: daskal-ai/overlays/dev1
+    targetRevision: develop
+    path: deploy/dev/overlays/dev1
   destination:
     server: https://kubernetes.default.svc
     namespace: argocd
@@ -26,8 +26,8 @@ spec:
   project: default
   source:
     repoURL: git@github.com:bsdemon/daskal_ai.git  # Replace with your actual Git repository URL
-    targetRevision: HEAD
-    path: daskal-ai/overlays/dev2
+    targetRevision: develop
+    path: deploy/dev/overlays/dev2
   destination:
     server: https://kubernetes.default.svc
     namespace: argocd
@@ -45,8 +45,8 @@ spec:
   project: default
   source:
     repoURL: git@github.com:bsdemon/daskal_ai.git  # Replace with your actual Git repository URL
-    targetRevision: HEAD
-    path: daskal-ai/overlays/dev3
+    targetRevision: develop
+    path: deploy/dev/overlays/dev3
   destination:
     server: https://kubernetes.default.svc
     namespace: argocd
@@ -64,8 +64,8 @@ spec:
   project: default
   source:
     repoURL: git@github.com:bsdemon/daskal_ai.git  # Replace with your actual Git repository URL
-    targetRevision: HEAD
-    path: daskal-ai/overlays/dev4
+    targetRevision: develop
+    path: deploy/dev/overlays/dev4
   destination:
     server: https://kubernetes.default.svc
     namespace: argocd
