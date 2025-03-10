@@ -26,8 +26,8 @@ spec:
               mountPath: /app/backend/data
           resources:
             requests:
-              memory: "6Gi"
-              cpu: "1.5"
+              memory: "3Gi"
+              cpu: "0.9"
             limits:
               memory: "7Gi"
               cpu: "1.9"
