@@ -1,11 +1,11 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: staging-daskal-ai-ingress
+  name: daskal-ai-ingress
   namespace: argocd
 spec:
   rules:
-  - host: staging.daskal.ai
+  - host: daskal.ai
     http:
       paths:
       - path: /
