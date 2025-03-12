@@ -13,7 +13,7 @@ spec:
       labels:
         app: daskal-ai-pod
       annotations:
-        rollme: "v7"  # Change this value (e.g., to "v2", "v3", etc.) whenever you need to force a rollout
+        rollme: "v8"  # Change this value (e.g., to "v2", "v3", etc.) whenever you need to force a rollout
     spec:
       containers:
         - name: daskal-ai
