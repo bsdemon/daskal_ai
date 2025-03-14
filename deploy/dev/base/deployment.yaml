@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: daskal-ai
-          image: ghcr.io/bsdemon/open-webui:main
+          image: ghcr.io/open-webui/open-webui:main
           imagePullPolicy: Always  # Added to ensure it always pulls the latest version
           ports:
             - containerPort: 8080
@@ -26,11 +26,11 @@ spec:
               mountPath: /app/backend/data
           resources:
             requests:
-              memory: "3Gi"
+              memory: "1Gi"
               cpu: "0.9"
             limits:
               memory: "7Gi"
-              cpu: "1.8"
+              cpu: "3.5"
       volumes:
         - name: data-volume
           persistentVolumeClaim:
