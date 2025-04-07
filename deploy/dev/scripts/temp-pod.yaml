@@ -1,0 +1,25 @@
+# pvc-helper-pod.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pvc-copy-helper
+spec:
+  containers:
+  - name: helper
+    image: busybox
+    command: ["sleep", "3600"]
+    volumeMounts:
+    - mountPath: /data  # default mount path (can be templated)
+      name: target-volume
+    resources:
+      requests:
+        memory: "0.5Gi"
+        cpu: "0.2"
+      limits:
+        memory: "2Gi"
+        cpu: "1"
+  volumes:
+  - name: target-volume
+    persistentVolumeClaim:
+      claimName: dev1-daskal-ai-data-pvc  # this should match PVC name
+  restartPolicy: Never
