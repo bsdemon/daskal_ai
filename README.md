@@ -41,6 +41,15 @@ A Retrieval-Augmented Generation (RAG) backend built with FastAPI and ChromaDB, 
    
 4. Edit the `.env` file to add your API keys.
 
+### Development Commands
+- Run server: `python -m uvicorn src.main:app --reload`
+- Format code: `black src/`
+- Lint: `uv run ruff check`
+- Type check: `mypy src/`
+- Run all tests: `pytest`
+- Run single test: `pytest path/to/test_file.py::test_function_name`
+- Install dependencies: `uv pip install -e .`
+
 ## Usage
 
 ### Start the API server

@@ -1,21 +1,16 @@
-from fastapi import APIRouter, HTTPException, Depends
-from typing import Dict, Any, List
+from fastapi import APIRouter, HTTPException
 
 from src.models.schemas import (
-    Document,
     DocumentBatch,
-    DocumentID,
     DocumentIDs,
     Query,
     QueryResults,
     RAGRequest,
     RAGResponse,
     HealthResponse,
-    QueryResult
 )
 from src.services.rag_service import RAGService
 from src.utils.text_splitter import TextSplitter
-from src.core.config import dynamic_settings as settings
 from src.api.config_routes import config_router
 
 # Create router
@@ -28,11 +23,13 @@ api_router.include_router(config_router)
 rag_service = RAGService()
 text_splitter = TextSplitter()
 
+
 @api_router.get("/health", response_model=HealthResponse)
 async def health_check():
     """Simple health check endpoint for Kubernetes."""
     # Just return a basic OK status
     return HealthResponse(status="ok")
+
 
 @api_router.post("/documents", response_model=DocumentIDs)
 async def add_documents(documents: DocumentBatch):
@@ -40,42 +37,41 @@ async def add_documents(documents: DocumentBatch):
     # Extract text and metadata
     texts = [doc.text for doc in documents.documents]
     metadatas = [doc.metadata for doc in documents.documents]
-    
+
     # Add documents
     try:
         ids = await rag_service.add_documents(texts, metadatas)
         return DocumentIDs(ids=ids)
     except Exception as e:
         raise HTTPException(
-            status_code=500,
-            detail=f"Failed to add documents: {str(e)}"
+            status_code=500, detail=f"Failed to add documents: {str(e)}"
         )
+
 
 @api_router.post("/documents/chunks", response_model=DocumentIDs)
 async def add_chunked_documents(documents: DocumentBatch):
     """Add documents to the vector database after chunking them."""
     # Prepare documents for chunking
     docs_for_chunking = [
-        {"text": doc.text, "metadata": doc.metadata}
-        for doc in documents.documents
+        {"text": doc.text, "metadata": doc.metadata} for doc in documents.documents
     ]
-    
+
     # Split documents into chunks
     chunked_docs = text_splitter.split_documents(docs_for_chunking)
-    
+
     # Extract text and metadata
     texts = [doc["text"] for doc in chunked_docs]
     metadatas = [doc["metadata"] for doc in chunked_docs]
-    
+
     # Add documents
     try:
         ids = await rag_service.add_documents(texts, metadatas)
         return DocumentIDs(ids=ids)
     except Exception as e:
         raise HTTPException(
-            status_code=500,
-            detail=f"Failed to add documents: {str(e)}"
+            status_code=500, detail=f"Failed to add documents: {str(e)}"
         )
+
 
 @api_router.delete("/documents/{doc_id}")
 async def delete_document(doc_id: str):
@@ -85,9 +81,9 @@ async def delete_document(doc_id: str):
         return {"message": f"Document {doc_id} deleted successfully"}
     except Exception as e:
         raise HTTPException(
-            status_code=500,
-            detail=f"Failed to delete document: {str(e)}"
+            status_code=500, detail=f"Failed to delete document: {str(e)}"
         )
+
 
 @api_router.post("/search", response_model=QueryResults)
 async def search_documents(query: Query):
@@ -97,14 +93,12 @@ async def search_documents(query: Query):
             query=query.text,
             n_results=query.n_results,
             where=query.where,
-            rerank_method=query.rerank_method
+            rerank_method=query.rerank_method,
         )
         return QueryResults(results=results)
     except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Search failed: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=f"Search failed: {str(e)}")
+
 
 @api_router.post("/rag", response_model=RAGResponse)
 async def generate_rag_response(request: RAGRequest):
@@ -118,14 +112,12 @@ async def generate_rag_response(request: RAGRequest):
             temperature=request.temperature,
             llm_provider=request.llm_provider,
             embedding_provider=request.embedding_provider,
-            rerank_method=request.rerank_method
+            rerank_method=request.rerank_method,
         )
         return response
     except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"RAG generation failed: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=f"RAG generation failed: {str(e)}")
+
 
 @api_router.delete("/collection")
 async def clear_collection():
@@ -135,6 +127,5 @@ async def clear_collection():
         return {"message": "Collection cleared successfully"}
     except Exception as e:
         raise HTTPException(
-            status_code=500,
-            detail=f"Failed to clear collection: {str(e)}"
+            status_code=500, detail=f"Failed to clear collection: {str(e)}"
         )
