@@ -217,16 +217,6 @@ print(response.json())
 
 The configuration is stored in SQLite and persists across application restarts. The database is created in the same directory as your ChromaDB data.
 
-## Architecture
-
-The application follows a modular architecture:
-
-- **API Layer**: FastAPI routes and endpoints
-- **Service Layer**: Business logic and service implementations
-- **Data Layer**: Vector database and storage
-- **Models**: Data schemas and validation
-- **Utils**: Helper utilities
-
 ## License
 
 MIT License

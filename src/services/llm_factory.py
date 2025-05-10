@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import Optional
-from anthropic import Anthropic
+from anthropic import AsyncAnthropic
 from src.core.config import dynamic_settings as settings
 
 
@@ -24,7 +24,7 @@ class AnthropicClient(LLMClient):
     def __init__(self):
         if not settings.ANTHROPIC_API_KEY:
             raise ValueError("ANTHROPIC_API_KEY is not set")
-        self.client = Anthropic(api_key=settings.ANTHROPIC_API_KEY)
+        self.client = AsyncAnthropic(api_key=settings.ANTHROPIC_API_KEY)
 
     async def generate(
         self,
@@ -34,16 +34,21 @@ class AnthropicClient(LLMClient):
     ) -> str:
         temp = temperature if temperature is not None else settings.TEMPERATURE
 
-        response = self.client.messages.create(
+        response = await self.client.messages.create(
             model="claude-3-opus-20240229",
             max_tokens=1024,
             system=(
                 system_prompt if system_prompt else "You are a helpful AI assistant."
             ),
-            messages=[{"role": "user", "content": prompt}],
+            messages=[
+                {
+                    "role": "user",
+                    "content": prompt
+                }
+            ],
             temperature=temp,
         )
-
+        print(response)
         return response.content[0].text
 
 

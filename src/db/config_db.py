@@ -1,25 +1,34 @@
-import sqlite3
-import os
+
 import json
+import os
+import sqlite3
+from pathlib import Path
+
+
 from typing import Dict, Any, Optional, List
 from contextlib import contextmanager
 from src.core.config import settings
 
+CONFIG_DB_PATH = Path(__file__).resolve().parent.parent.parent.joinpath("data").joinpath("config_db")
+CONFIG_DB_FILENAME = "config_db.sqlite3"
 
 class ConfigDB:
     """SQLite-based configuration database."""
 
-    def __init__(self, db_path: str = "") -> None:
+    def __init__(self) -> None:
         # Set DB path to a file in the ChromaDB directory for consistency
-        if db_path is None:
-            os.makedirs(settings.CHROMA_PERSIST_DIRECTORY, exist_ok=True)
-            db_path = os.path.join(settings.CHROMA_PERSIST_DIRECTORY, "config.db")
-
-        self.db_path = db_path
-        self._initialize_db()
+        self.db_path = CONFIG_DB_PATH
+        if not self.db_path.exists():
+            self.db_path.mkdir(parents=True, exist_ok=True)
+        
+        # Only initialize if the database doesn't exist
+        if not self.database_exists():
+            self._initialize_db()
 
     def _initialize_db(self) -> None:
         """Initialize the database schema if it doesn't exist."""
+        
+        # Create and initialize the database
         with self._get_connection() as conn:
             cursor = conn.cursor()
 
@@ -50,13 +59,22 @@ class ConfigDB:
             )
 
             conn.commit()
+            
+        # After creating the schema, populate with default settings from environment
+        self.initialize_default_settings()
 
+    def database_exists(self) -> bool:
+        """Check if the database file exists."""
+        db_file = self.db_path / CONFIG_DB_FILENAME
+        return db_file.exists() and db_file.stat().st_size > 0
+        
     @contextmanager
     def _get_connection(self):
         """Get a database connection with context management."""
+        db_file = self.db_path / CONFIG_DB_FILENAME
         conn = None
         try:
-            conn = sqlite3.connect(self.db_path)
+            conn = sqlite3.connect(str(db_file))
             # Enable foreign keys
             conn.execute("PRAGMA foreign_keys = ON")
             # Return dict objects instead of tuples
@@ -117,8 +135,7 @@ class ConfigDB:
                 "SELECT key, value, value_type, description, group_name, created_at, updated_at FROM settings"
             )
             results = cursor.fetchall()
-
-            return [
+            res = [
                 {
                     "key": row["key"],
                     "value": self._convert_value(row["value"], row["value_type"]),
@@ -129,7 +146,8 @@ class ConfigDB:
                     "updated_at": row["updated_at"],
                 }
                 for row in results
-            ]
+            ] 
+            return res 
 
     def set_setting(
         self,

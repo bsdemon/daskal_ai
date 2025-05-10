@@ -88,7 +88,7 @@ class RAGResponse(BaseModel):
     """Schema for a RAG response."""
 
     answer: str = Field(..., description="The generated answer")
-    sources: List[QueryResult] = Field(
+    sources: Optional[List[QueryResult]] = Field(
         ..., description="The sources used for the answer"
     )
 

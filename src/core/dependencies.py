@@ -2,7 +2,7 @@ from fastapi import Security, HTTPException, status
 from fastapi.security.api_key import APIKeyHeader
 from src.core.config import dynamic_settings as settings
 
-API_KEY_NAME = "X-API-Key"
+API_KEY_NAME = "Token"
 api_key_header = APIKeyHeader(name=API_KEY_NAME, auto_error=False)
 
 

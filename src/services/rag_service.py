@@ -2,6 +2,7 @@ from typing import List, Dict, Any, Optional
 from src.db.vector_db import ContextualVectorDB
 from src.services.llm_factory import LLMFactory
 from src.models.schemas import QueryResult, RAGResponse
+from src.core.config import dynamic_settings as settings
 
 
 class RAGService:
@@ -85,31 +86,34 @@ class RAGService:
     ) -> RAGResponse:
         """Generate a response to the query using RAG."""
         # Override the embedding provider if specified
-        if (
-            embedding_provider
-            and embedding_provider != self.vector_db.embedding_client.__class__.__name__
-        ):
-            self.vector_db.embedding_client = embedding_provider
+        # Generate default system prompt if not provided
+        rag_prompt = query
+        results = None
+        if system_prompt is None:
+            system_prompt = settings.base_settings.SYSTEM_PROMPT
+            
+        if settings.base_settings.ENABLE_EMBEDDING:
+            if (
+                embedding_provider
+                and embedding_provider != self.vector_db.embedding_client.__class__.__name__
+            ):
+                self.vector_db.embedding_client = embedding_provider
 
-        # Search for relevant documents
-        results = await self.search(query, n_results, where, rerank_method)
+            # Create RAG prompt
+            if embedding_provider:
 
+                # Search for relevant documents
+                results = await self.search(query, n_results, where, rerank_method)
+
+                rag_prompt = self._format_rag_prompt(query, results)
+        
         # Create LLM client
         llm_client = LLMFactory.create_client(llm_provider)
 
-        # Generate default system prompt if not provided
-        if system_prompt is None:
-            system_prompt = (
-                "You are a helpful AI assistant. Answer the user's question based on the provided context. "
-                "If the answer is not found in the context, say so clearly and provide a general response. "
-                "Always cite your sources using the numbers in brackets [1], [2], etc."
-            )
-
-        # Create RAG prompt
-        rag_prompt = self._format_rag_prompt(query, results)
 
         # Generate answer
         answer = await llm_client.generate(rag_prompt, system_prompt, temperature)
-
+        print(f"Answer: {answer}")
+        
         # Return response
         return RAGResponse(answer=answer, sources=results)

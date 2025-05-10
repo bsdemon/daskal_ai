@@ -1,5 +1,3 @@
-import asyncio
-import os
 from typing import Optional
 from pydantic import Field, ValidationError
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -59,6 +57,12 @@ class Settings(BaseSettings):
     DEFAULT_RERANKING_METHOD: str = Field(
         "bm25", description="Default reranking method: bm25, cohere"
     )
+    SYSTEM_PROMPT: str = Field(
+        "You are a helpful AI assistant. Answer the user's question based on the provided context. "
+        "If the answer is not found in the context, say so clearly and provide a general response. "
+        "Always cite your sources using the numbers in brackets [1], [2], etc.",
+        description="System prompt for LLM"
+    )
 
 settings = None
 try:
@@ -76,7 +80,7 @@ class DynamicSettings:
     """Dynamic settings that combine environment variables with database settings."""
 
     def __init__(self, base_settings: Settings):
-        self._base_settings = base_settings
+        self.base_settings = base_settings
         self._db = None  # Will be initialized lazily
         self._lock = threading.Lock()
 
@@ -94,7 +98,7 @@ class DynamicSettings:
     def __getattr__(self, name):
         """Get a setting value, with database values taking precedence."""
         # Check if the attribute exists in the base settings
-        if hasattr(self._base_settings, name):
+        if hasattr(self.base_settings, name):
             # Try to get from database first
             try:
                 db = self._get_db()
@@ -106,7 +110,7 @@ class DynamicSettings:
                 pass
 
             # Fall back to base settings
-            return getattr(self._base_settings, name)
+            return getattr(self.base_settings, name)
 
         # If not found in base settings, raise AttributeError
         raise AttributeError(f"'DynamicSettings' object has no attribute '{name}'")

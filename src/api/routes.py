@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, status
 
 from src.models.schemas import (
     DocumentBatch,
@@ -7,7 +7,6 @@ from src.models.schemas import (
     QueryResults,
     RAGRequest,
     RAGResponse,
-    HealthResponse,
 )
 from src.services.rag_service import RAGService
 from src.utils.text_splitter import TextSplitter
@@ -22,13 +21,6 @@ api_router.include_router(config_router)
 # Create service instances
 rag_service = RAGService()
 text_splitter = TextSplitter()
-
-
-@api_router.get("/health", response_model=HealthResponse)
-async def health_check():
-    """Simple health check endpoint for Kubernetes."""
-    # Just return a basic OK status
-    return HealthResponse(status="ok")
 
 
 @api_router.post("/documents", response_model=DocumentIDs)
@@ -129,3 +121,8 @@ async def clear_collection():
         raise HTTPException(
             status_code=500, detail=f"Failed to clear collection: {str(e)}"
         )
+
+@api_router.get("/health", status_code=status.HTTP_200_OK)
+async def health_check():
+    """Simple health check endpoint for Kubernetes."""
+    return {"status": "ok"} 
