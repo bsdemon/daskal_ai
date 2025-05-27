@@ -99,13 +99,10 @@ class RAGService:
             ):
                 self.vector_db.embedding_client = embedding_provider
 
-            # Create RAG prompt
-            if embedding_provider:
+            # Search for relevant documents
+            results = await self.search(query, n_results, where, rerank_method)
 
-                # Search for relevant documents
-                results = await self.search(query, n_results, where, rerank_method)
-
-                rag_prompt = self._format_rag_prompt(query, results)
+            rag_prompt = self._format_rag_prompt(query, results)
         
         # Create LLM client
         llm_client = LLMFactory.create_client(llm_provider)

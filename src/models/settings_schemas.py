@@ -1,4 +1,4 @@
-from typing import Dict, Any, Optional, List
+from typing import Optional
 from pydantic import BaseModel, Field
 
 
@@ -8,9 +8,6 @@ class AppSettings(BaseModel):
     # Feature Flags
     enable_embedding: bool = Field(
         True, description="Enable embedding service"
-    )
-    enable_contextual_embedding: bool = Field(
-        True, description="Enable contextual descriptions for embeddings"
     )
     enable_reranking: bool = Field(
         True, description="Enable reranking service"
@@ -48,9 +45,6 @@ class AppSettingsUpdate(BaseModel):
     # Feature Flags
     enable_embedding: Optional[bool] = Field(
         None, description="Enable embedding service"
-    )
-    enable_contextual_embedding: Optional[bool] = Field(
-        None, description="Enable contextual descriptions for embeddings"
     )
     enable_reranking: Optional[bool] = Field(
         None, description="Enable reranking service"

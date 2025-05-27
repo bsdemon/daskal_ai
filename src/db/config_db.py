@@ -236,13 +236,6 @@ class ConfigDB:
             "features",
         )
 
-        self.set_setting(
-            "ENABLE_CONTEXTUAL_EMBEDDING",
-            settings.ENABLE_CONTEXTUAL_EMBEDDING,
-            "bool",
-            "Enable contextual descriptions for embeddings",
-            "features",
-        )
 
         self.set_setting(
             "ENABLE_RERANKING",

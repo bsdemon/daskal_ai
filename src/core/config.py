@@ -36,9 +36,6 @@ class Settings(BaseSettings):
 
     # Feature Flags
     ENABLE_EMBEDDING: bool = Field(True, description="Enable embedding service")
-    ENABLE_CONTEXTUAL_EMBEDDING: bool = Field(
-        True, description="Enable contextual descriptions for embeddings"
-    )
     ENABLE_RERANKING: bool = Field(True, description="Enable reranking service")
 
     # RAG Configuration

@@ -146,7 +146,6 @@ async def get_app_settings():
     # Convert database settings to camelCase keys for AppSettings
     return AppSettings(
         enable_embedding=settings_dict.get("ENABLE_EMBEDDING", True),
-        enable_contextual_embedding=settings_dict.get("ENABLE_CONTEXTUAL_EMBEDDING", True),
         enable_reranking=settings_dict.get("ENABLE_RERANKING", True),
         chunk_size=settings_dict.get("CHUNK_SIZE", 512),
         chunk_overlap=settings_dict.get("CHUNK_OVERLAP", 50),
@@ -174,14 +173,6 @@ async def update_app_settings(settings_update: AppSettingsUpdate):
             group_name="features",
         )
     
-    if settings_update.enable_contextual_embedding is not None:
-        config_db.set_setting(
-            key="ENABLE_CONTEXTUAL_EMBEDDING",
-            value=settings_update.enable_contextual_embedding,
-            value_type="bool",
-            description="Enable contextual descriptions for embeddings",
-            group_name="features",
-        )
     
     if settings_update.enable_reranking is not None:
         config_db.set_setting(

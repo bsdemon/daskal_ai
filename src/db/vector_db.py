@@ -109,177 +109,107 @@ class VectorDB:
         self.collection.delete(where={})
 
 
-class ContextualVectorDB(VectorDB):
-    """Enhanced vector database that adds context to document chunks before embedding."""
+# class ContextualVectorDB(VectorDB):
+#     """Enhanced vector database that adds context to document chunks before embedding."""
 
-    def __init__(
-        self,
-        collection_name: str = "contextual_documents",
-        embedding_provider: str = None,
-        llm_provider: str = None,
-        cache_file: str = "context_cache.json",
-    ):
-        super().__init__(collection_name, embedding_provider)
+#     def __init__(
+#         self,
+#         collection_name: str = "contextual_documents",
+#         embedding_provider: str = None,
+#         llm_provider: str = None,
+#         cache_file: str = "context_cache.json",
+#     ):
+#         super().__init__(collection_name, embedding_provider)
 
-        # Initialize contextual embedding settings
-        self.contextual_embedding_enabled = (
-            settings.ENABLE_CONTEXTUAL_EMBEDDING and settings.ENABLE_EMBEDDING
-        )
-        self.reranking_enabled = settings.ENABLE_RERANKING
+#         # Contextual embedding is disabled
+#         self.contextual_embedding_enabled = False
+#         self.reranking_enabled = settings.ENABLE_RERANKING
 
-        # Initialize LLM client if contextual embedding is enabled
-        self.llm_client = None
-        if self.contextual_embedding_enabled:
-            self.llm_client = LLMFactory.create_client(llm_provider)
+#         # No longer need LLM client for contextual embedding
+#         self.llm_client = None
 
-        # Setup context cache
-        self.cache_file = os.path.join(settings.CHROMA_PERSIST_DIRECTORY, cache_file)
-        self.context_cache = (
-            self._load_cache() if self.contextual_embedding_enabled else {}
-        )
+#         # Context cache not needed anymore
+#         self.cache_file = os.path.join(settings.CHROMA_PERSIST_DIRECTORY, cache_file)
+#         self.context_cache = {}
 
-    def _load_cache(self) -> Dict[str, str]:
-        """Load context cache from file."""
-        if os.path.exists(self.cache_file):
-            try:
-                with open(self.cache_file, "r") as f:
-                    return json.load(f)
-            except: # noqa: E722
-                return {}
-        return {}
+#     def _load_cache(self) -> Dict[str, str]:
+#         """Load context cache from file."""
+#         if os.path.exists(self.cache_file):
+#             try:
+#                 with open(self.cache_file, "r") as f:
+#                     return json.load(f)
+#             except: # noqa: E722
+#                 return {}
+#         return {}
 
-    def _save_cache(self) -> None:
-        """Save context cache to file."""
-        with open(self.cache_file, "w") as f:
-            json.dump(self.context_cache, f)
+#     def _save_cache(self) -> None:
+#         """Save context cache to file."""
+#         with open(self.cache_file, "w") as f:
+#             json.dump(self.context_cache, f)
 
-    async def _generate_context(self, text: str) -> str:
-        """Generate contextual description for a text chunk."""
-        # If contextual embedding is disabled, return empty string
-        if not self.contextual_embedding_enabled or not self.llm_client:
-            return ""
+#     async def _generate_context(self, text: str) -> str:
+#         """Generate contextual description for a text chunk."""
+#         # Contextual embedding is disabled, always return empty string
+#         return ""
 
-        # Check if context is already in cache
-        text_hash = str(hash(text))
-        if text_hash in self.context_cache:
-            return self.context_cache[text_hash]
+#     async def add_documents(
+#         self, documents: List[str], metadatas: List[Dict[str, Any]] = None
+#     ) -> List[str]:
+#         """Add documents with contextual descriptions to the vector database."""
+#         if not documents:
+#             return []
 
-        # Generate context using LLM
-        prompt = (
-            "Generate a concise, factual description of what this text is about. "
-            "Focus on key topics, entities, and concepts. Be specific but brief.\n\n"
-            f"Text: {text}\n\n"
-            "Description:"
-        )
+#         # Generate IDs and prepare metadata
+#         if metadatas is None:
+#             metadatas = [{"source": "unknown"} for _ in documents]
 
-        context = await self.llm_client.generate(prompt)
+#         ids = [str(uuid.uuid4()) for _ in documents]
 
-        # Clean and store in cache
-        context = context.strip()
-        self.context_cache[text_hash] = context
-        self._save_cache()
+#         # Contextual embedding is disabled, just add documents normally
+#         return await super().add_documents(documents, metadatas)
 
-        return context
+#     async def search(
+#         self,
+#         query: str,
+#         n_results: int = 10,
+#         where: Dict[str, Any] = None,
+#         rerank_method: str = None,
+#     ) -> List[Dict[str, Any]]:
+#         """Search with enhanced contextual query and optional reranking."""
+#         # First get standard vector search results
+#         results = await super().search(query, n_results, where)
 
-    async def add_documents(
-        self, documents: List[str], metadatas: List[Dict[str, Any]] = None
-    ) -> List[str]:
-        """Add documents with contextual descriptions to the vector database."""
-        if not documents:
-            return []
+#         # Apply reranking if enabled and specified
+#         if self.reranking_enabled and rerank_method and results:
+#             # Extract original texts from metadata for reranking
+#             original_texts = [
+#                 result["metadata"].get("original_text", result["text"])
+#                 for result in results
+#             ]
+#             scores = [result.get("score", 0.0) for result in results]
 
-        # Generate IDs and prepare metadata
-        if metadatas is None:
-            metadatas = [{"source": "unknown"} for _ in documents]
+#             # Create reranker and apply
+#             try:
+#                 reranker = RerankerFactory.create_client(rerank_method)
+#                 reranked = await reranker.rerank(query, original_texts, scores)
 
-        ids = [str(uuid.uuid4()) for _ in documents]
+#                 # Reorganize results based on reranking
+#                 reranked_results = []
+#                 for doc, score in reranked:
+#                     # Find the original result for this document
+#                     for result in results:
+#                         if (
+#                             result["metadata"].get("original_text", result["text"])
+#                             == doc
+#                         ):
+#                             result_copy = result.copy()
+#                             result_copy["score"] = score
+#                             reranked_results.append(result_copy)
+#                             break
 
-        # If contextual embedding is enabled, generate enhanced docs
-        if (
-            self.contextual_embedding_enabled
-            and self.embedding_enabled
-            and self.llm_client
-        ):
-            enhanced_docs = []
-            enhanced_metadatas = []
+#                 return reranked_results
+#             except Exception as e:
+#                 # If reranking fails, just return the original results
+#                 print(f"Reranking error: {str(e)}")
 
-            # Generate contextual descriptions for each document
-            for i, doc in enumerate(documents):
-                context = await self._generate_context(doc)
-
-                # Create enhanced document with context
-                enhanced_doc = (
-                    f"Context: {context}\n\nContent: {doc}" if context else doc
-                )
-                enhanced_docs.append(enhanced_doc)
-
-                # Add context to metadata
-                meta = metadatas[i].copy()
-                if context:
-                    meta["context"] = context
-                meta["original_text"] = doc
-                enhanced_metadatas.append(meta)
-
-            # Generate embeddings for enhanced documents if embedding is enabled
-            embeddings = None
-            if self.embedding_enabled and self.embedding_client:
-                embeddings = await self.embedding_client.embed(enhanced_docs)
-
-            # Add to ChromaDB
-            self.collection.add(
-                embeddings=embeddings,
-                documents=enhanced_docs,
-                metadatas=enhanced_metadatas,
-                ids=ids,
-            )
-        else:
-            # Just add documents normally without contextual enhancement
-            return await super().add_documents(documents, metadatas)
-
-        return ids
-
-    async def search(
-        self,
-        query: str,
-        n_results: int = 10,
-        where: Dict[str, Any] = None,
-        rerank_method: str = None,
-    ) -> List[Dict[str, Any]]:
-        """Search with enhanced contextual query and optional reranking."""
-        # First get standard vector search results
-        results = await super().search(query, n_results, where)
-
-        # Apply reranking if enabled and specified
-        if self.reranking_enabled and rerank_method and results:
-            # Extract original texts from metadata for reranking
-            original_texts = [
-                result["metadata"].get("original_text", result["text"])
-                for result in results
-            ]
-            scores = [result.get("score", 0.0) for result in results]
-
-            # Create reranker and apply
-            try:
-                reranker = RerankerFactory.create_client(rerank_method)
-                reranked = await reranker.rerank(query, original_texts, scores)
-
-                # Reorganize results based on reranking
-                reranked_results = []
-                for doc, score in reranked:
-                    # Find the original result for this document
-                    for result in results:
-                        if (
-                            result["metadata"].get("original_text", result["text"])
-                            == doc
-                        ):
-                            result_copy = result.copy()
-                            result_copy["score"] = score
-                            reranked_results.append(result_copy)
-                            break
-
-                return reranked_results
-            except Exception as e:
-                # If reranking fails, just return the original results
-                print(f"Reranking error: {str(e)}")
-
-        return results
+#         return results

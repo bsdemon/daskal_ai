@@ -1,12 +1,11 @@
 # FastAPI RAG Backend
 
-A Retrieval-Augmented Generation (RAG) backend built with FastAPI and ChromaDB, based on Anthropic's contextual retrieval approach.
+A Retrieval-Augmented Generation (RAG) backend built with FastAPI and ChromaDB.
 
 ## Features
 
 - **Multiply AI Clients**: Easily switch between Anthropic, OpenAI, and Google Gemini for LLM generation
 - **Vector Database Integration**: Uses ChromaDB for vector storage and retrieval
-- **Contextual Embeddings**: Enhances document chunks with contextual descriptions before embedding
 - **Multiple Embedding Providers**: Support for Voyage AI and OpenAI embeddings
 - **Advanced Reranking**: BM25 and Cohere reranking to improve retrieval quality
 - **API Authentication**: Preshared key authentication for secure API access
@@ -165,9 +164,6 @@ You can enable or disable specific features using environment variables or the c
 # This makes the system fall back to keyword search
 ENABLE_EMBEDDING=True
 
-# Set to False to disable contextual descriptions for embeddings
-# This saves LLM API calls while still using vector search
-ENABLE_CONTEXTUAL_EMBEDDING=True
 
 # Set to False to disable reranking
 # This can improve response time if reranking isn't needed
@@ -177,12 +173,7 @@ ENABLE_RERANKING=True
 When `ENABLE_EMBEDDING` is set to `False`, the system will:
 - Skip generating embeddings for documents
 - Use ChromaDB's built-in keyword search instead of vector search
-- Skip contextual enhancements (regardless of `ENABLE_CONTEXTUAL_EMBEDDING` setting)
 
-When `ENABLE_CONTEXTUAL_EMBEDDING` is set to `False` but `ENABLE_EMBEDDING` is `True`, the system will:
-- Skip generating contextual descriptions with LLM
-- Use regular embeddings without context
-- Still perform vector search
 
 When `ENABLE_RERANKING` is set to `False`, the system will:
 - Skip the reranking step
